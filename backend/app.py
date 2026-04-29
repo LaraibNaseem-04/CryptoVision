@@ -2,6 +2,7 @@
 CryptoVision - Bitcoin Price Prediction Backend
 Flask API for predicting BTC prices using LSTM Neural Network
 """
+#this is the comment
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
