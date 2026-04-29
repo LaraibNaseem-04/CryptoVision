@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  # Backend API Service
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: cryptovision-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - FLASK_APP=app.py
+    volumes:
+      - ./backend:/app
+      - ./Bitcoin_Price_Prediction_Model.keras:/app/Bitcoin_Price_Prediction_Model.keras:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - cryptovision-network
+
+  # Frontend Service
+  frontend:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    container_name: cryptovision-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://backend:5000/api
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - cryptovision-network
+
+networks:
+  cryptovision-network:
+    driver: bridge
+
+volumes:
+  backend-data:
